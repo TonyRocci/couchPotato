@@ -1,14 +1,29 @@
 import numpy as np
 import pyautogui
 import time
+import tkinter as tk
+
 
 #Get the size of the primary monitor
-screenWidth, screenHeight = pyautogui.size()
+screenWidth, screenHeight = pyautogui.size() 
+
+#Code for window
+
+# Create the main window (root widget)
+root = tk.Tk()
+
+# Set the window title
+root.title("Wizard101 Couch Potato")
+
+#Window width/height set to 1/3 of monitor resolution
+root.geometry(str(int(screenWidth / 3)) + "x" + str(int(screenHeight / 3)))
+
+#  Start the main event loop
+# root.mainloop()
 
 #reads image files
 book = "notBattle.png"
-card1 = "card.png"
-zand = "zand.png"
+card = "zand.png"
 battle = False
 
 while not battle:
@@ -16,10 +31,10 @@ while not battle:
     try:
         
         #Detect if in battle by looking for mana gauge
-        bookLocation = pyautogui.locateOnScreen(book)
+        bookLocation = pyautogui.locateOnScreen(book, confidence=0.7)
         
         print("Not in Battle")
-        time.sleep(5)
+        time.sleep(3)
         
     except pyautogui.ImageNotFoundException:
 
@@ -33,20 +48,17 @@ while battle:
     try:
          
         #Store from: left, top, width, height
-        cardLocation = list(pyautogui.locateOnScreen(card1))
+        cardLocation = pyautogui.locateOnScreen(card, confidence=0.7)
         
-        #X position = monitor width - distance across
-        cardX = cardLocation.get(2) - cardLocation.get(0)
+        #Click at card location, interval of 1 sec travel time
+        pyautogui.click(cardLocation, interval=1)
+        pyautogui.click()
+        time.sleep(1)
         
-        #Y position = monitor height - distance below
-        cardY = cardLocation.get(3) - cardLocation.get(1)
-        
-        pyautogui.click(cardX, cardY, interval=1)
-    
     except pyautogui.ImageNotFoundException:
         
         print("Card not found.")
-        
+        time.sleep(3)
          
     
     
