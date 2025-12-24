@@ -25,40 +25,58 @@ root.geometry(str(int(screenWidth / 3)) + "x" + str(int(screenHeight / 3)))
 book = "notBattle.png"
 card = "zand.png"
 battle = False
+while True:
+    while not battle:
+        
+        try:
+            #Detect if in battle by looking for mana gauge
+            bookLocation = pyautogui.locateOnScreen(book, confidence=0.5)
+            
+            try:
+                
+                noMana = pyautogui.locateOnScreen('noMana.png', confidence=0.9)
+                potionLocation = pyautogui.locateOnScreen('potion.png', confidence=0.5)
+                pyautogui.click(potionLocation, interval=1)
+                
+            except pyautogui.ImageNotFoundException:
+                
+                print("Not in Battle")
+                pyautogui.keyDown('w')
+                time.sleep(0.1)
+                pyautogui.keyUp('w')
+                time.sleep(5)
+            
+        except pyautogui.ImageNotFoundException:
 
-while not battle:
-    
-    try:
-        
-        #Detect if in battle by looking for mana gauge
-        bookLocation = pyautogui.locateOnScreen(book, confidence=0.7)
-        
-        print("Not in Battle")
-        time.sleep(3)
-        
-    except pyautogui.ImageNotFoundException:
+            battle = True
 
-        battle = True
+            
+    while battle:
         
-        #In case of issues, end program
-        if not battle: break
-        
-while battle:
-    
-    try:
-         
-        #Store from: left, top, width, height
-        cardLocation = pyautogui.locateOnScreen(card, confidence=0.7)
-        
-        #Click at card location, interval of 1 sec travel time
-        pyautogui.click(cardLocation, interval=1)
-        pyautogui.click()
-        time.sleep(1)
-        
-    except pyautogui.ImageNotFoundException:
-        
-        print("Card not found.")
-        time.sleep(3)
+        try:
+            
+            #Store from: left, top, width, height
+            cardLocation = pyautogui.locateOnScreen(card, confidence=0.5)
+            
+            #Click at card location, interval of 1 sec travel time
+            pyautogui.click(cardLocation, interval=1)
+            pyautogui.click()
+            time.sleep(1)
+            
+        except pyautogui.ImageNotFoundException:
+            
+            print("Card not found.")
+            time.sleep(5)
+            
+            try:
+                
+                bookLocation = pyautogui.locateOnScreen(book, confidence=0.5)
+                battle = False
+                
+            except pyautogui.ImageNotFoundException:
+                
+                battle = True
+
          
     
     
