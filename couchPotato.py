@@ -74,7 +74,7 @@ with open('AOEs.csv') as f:
     for x in f:
         aoes.append(x.replace(',', '').replace('\n', ''))
 
-
+f.close()
 # Create the main window (root widget)
 root = Tk()
 
@@ -87,11 +87,11 @@ mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 #Create dropdown to choose spell
 ttk.Label(mainframe, text="Choose Your Spell:").grid(column=2, row=1, sticky=N)
 spellDropdown = ttk.Combobox(mainframe, textvariable=spell, values=aoes, state="readonly")
-spellDropdown.grid(column=2, row=2, sticky=W)
+spellDropdown.grid(column=2, row=2, sticky=S)
 
 #Create button to start program
 ttk.Label(mainframe, text="Press to Begin").grid(column=1, row=1, sticky=N)
-ttk.Button(mainframe, text="Start", command=lambda: thr.Thread(target=battle, args=(spellDropdown.get(),), daemon=True).start()).grid(column=1, row=2, sticky=E)
+ttk.Button(mainframe, text="Start", command=lambda: thr.Thread(target=battle, args=(spellDropdown.get(),), daemon=True).start()).grid(column=1, row=2, sticky=S)
 
 
 #Add padding and reactive resizing
