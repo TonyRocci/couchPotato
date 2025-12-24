@@ -1,82 +1,104 @@
-import numpy as np
-import pyautogui
+import pyautogui as gui
 import time
-import tkinter as tk
+from tkinter import *
+from tkinter import ttk
+import threading as thr
 
+def battle(spell):
+    
+    #reads image files
+    path = "Spells\\" + str(spell) + ".png"
+    book = "notBattle.png"
+    card = path 
+    inBattle = False
 
-#Get the size of the primary monitor
-screenWidth, screenHeight = pyautogui.size() 
+    while True:
+        while not inBattle:
+            
+            try:
+                #Detect if in inBattle by looking for mana gauge
+                bookLocation = gui.locateOnScreen(book, confidence=0.5)
+                
+                try:
+                    #If empty mana gauge is detected, try to potion
+                    noMana = gui.locateOnScreen('noMana.png', confidence=0.9)
+                    potionLocation = gui.locateOnScreen('potion.png', confidence=0.5)
+                    gui.click(potionLocation, interval=1)
+                    
+                except gui.ImageNotFoundException:
+                    
+                    print("Not in Battle")
+                    gui.keyDown('w')
+                    time.sleep(0.1)
+                    gui.keyUp('w')
+                    time.sleep(5)
+                
+            except gui.ImageNotFoundException:
 
-#Code for window
+                inBattle = True
+
+                
+        while inBattle:
+            
+            try:
+                
+                #Store from: left, top, width, height
+                cardLocation = gui.locateOnScreen(card, confidence=0.5)
+                
+                #Click at card location, interval of 1 sec travel time
+                gui.click(cardLocation, interval=1)
+                gui.click()
+                time.sleep(1)
+                
+            except gui.ImageNotFoundException:
+                
+                print(spell + " not found.")
+                time.sleep(5)
+                
+                try:
+                    
+                    bookLocation = gui.locateOnScreen(book, confidence=0.5)
+                    inBattle = False
+                    
+                except gui.ImageNotFoundException:
+                    
+                    inBattle = True
+                    pass
+                
+#Get list of spells
+spell = "Zand the Bandit"
+aoes = list()
+listOfAOEs = open('AOEs.csv')
+
+with open('AOEs.csv') as f:
+    for x in f:
+        aoes.append(x.replace(',', '').replace('\n', ''))
+
 
 # Create the main window (root widget)
-root = tk.Tk()
+root = Tk()
 
-# Set the window title
+# Set the window title and size
 root.title("Wizard101 Couch Potato")
 
-#Window width/height set to 1/3 of monitor resolution
-root.geometry(str(int(screenWidth / 3)) + "x" + str(int(screenHeight / 3)))
+mainframe = ttk.Frame(root, padding=(100,100,100,100))
+mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 
-#  Start the main event loop
-# root.mainloop()
+#Create dropdown to choose spell
+ttk.Label(mainframe, text="Choose Your Spell:").grid(column=2, row=1, sticky=N)
+spellDropdown = ttk.Combobox(mainframe, textvariable=spell, values=aoes, state="readonly")
+spellDropdown.grid(column=2, row=2, sticky=W)
 
-#reads image files
-book = "notBattle.png"
-card = "zand.png"
-battle = False
-while True:
-    while not battle:
-        
-        try:
-            #Detect if in battle by looking for mana gauge
-            bookLocation = pyautogui.locateOnScreen(book, confidence=0.5)
-            
-            try:
-                
-                noMana = pyautogui.locateOnScreen('noMana.png', confidence=0.9)
-                potionLocation = pyautogui.locateOnScreen('potion.png', confidence=0.5)
-                pyautogui.click(potionLocation, interval=1)
-                
-            except pyautogui.ImageNotFoundException:
-                
-                print("Not in Battle")
-                pyautogui.keyDown('w')
-                time.sleep(0.1)
-                pyautogui.keyUp('w')
-                time.sleep(5)
-            
-        except pyautogui.ImageNotFoundException:
+#Create button to start program
+ttk.Label(mainframe, text="Press to Begin").grid(column=1, row=1, sticky=N)
+ttk.Button(mainframe, text="Start", command=lambda: thr.Thread(target=battle, args=(spellDropdown.get(),), daemon=True).start()).grid(column=1, row=2, sticky=E)
 
-            battle = True
 
-            
-    while battle:
-        
-        try:
-            
-            #Store from: left, top, width, height
-            cardLocation = pyautogui.locateOnScreen(card, confidence=0.5)
-            
-            #Click at card location, interval of 1 sec travel time
-            pyautogui.click(cardLocation, interval=1)
-            pyautogui.click()
-            time.sleep(1)
-            
-        except pyautogui.ImageNotFoundException:
-            
-            print("Card not found.")
-            time.sleep(5)
-            
-            try:
-                
-                bookLocation = pyautogui.locateOnScreen(book, confidence=0.5)
-                battle = False
-                
-            except pyautogui.ImageNotFoundException:
-                
-                battle = True
+#Add padding and reactive resizing
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)	
+mainframe.columnconfigure(2, weight=1)
+for child in mainframe.winfo_children(): 
+    child.grid_configure(padx=5, pady=5)
 
-         
-    
-    
+root.mainloop()
